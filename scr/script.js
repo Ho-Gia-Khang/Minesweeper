@@ -1,32 +1,40 @@
-// varialbles declaration
-let isLightSquare;
-let squareColor;
-let lightCol;
-let darkCol;
-let position;
-const whiteIndex = 0;
-const blackIndex = 1;
+document.addEventListener('DOMContentLoaded',() =>{
+    // varialbles declaration
+    let width = 10;
+    let height = 10;
+    let bombAmount = 20;
+    let flags = 0;
+    let squares = [];
+    let isGameOver = false;
 
-// main function to create the board
-function createGraphicalBoard(){
-    for (file = 0; file < 8; file++){
-        for(rank = 0; rank < 8; rank++){
-            isLightSquare = (file + rank) % 2 != 0; // check the color of the square
-            if(isLightSquare){
-                squareColor = lightCol;
-            }
-            else{
-                squareColor = darkCol;
-            }
-            position = [file*64, rank*64]
-            
-            drawSquares(color, position)
-        }
-    }
-}
+    // main function to create the board
+    function createBoard(){
+        
+    };
 
-// function to draw the board
-function drawSquares(color, position){
-    this.squareColor = color;
-    this.position = position;
-}
+    // function to draw the board
+    function drawSquares(color, position){
+        this.squareColor = color;
+        this.position = position;
+    };
+
+    // function to handle the click event
+    function click(){
+
+    };
+
+    // function to check whether the square is a bomb, or any bomb near by the square to calculate the display number
+    function checkSquare(){
+
+    };
+
+    // function to add the flag onto the square
+    function addFlag(){
+        
+    };
+
+    // function to draw the added flags
+    function drawFlags(position){
+        this.position = position;
+    };
+})
