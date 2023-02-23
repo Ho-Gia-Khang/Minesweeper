@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded',() =>{
     let squares = [];
     let isGameOver = false;
 
+    // initialize the game, the first move will always safe
+    function init(){
+
+    };
+
     // main function to create the board
     function createBoard(){
         
