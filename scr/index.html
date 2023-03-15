@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"/>
-    <title>Minesweeper</title>
-</head>
-<body>
-    <script src="script.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css"/>
+        <script src="script.js"></script>
+        <title>Minesweeper</title>
+    </head>
+
+    <body>
+        <label for="board-size">Choose the size for the board :P</label>
+        <select id="board-size" name="board-size">
+            <option value="8x8">8x8</option>
+            <option value="16x16">16x16</option>
+            <option value="16x32">16x32</option>
+        </select>
+
+        <div class="board" id="board"></div>
+        
+    </body>
 </html>
