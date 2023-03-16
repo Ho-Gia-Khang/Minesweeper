@@ -9,7 +9,14 @@
 document.addEventListener('DOMContentLoaded',() =>{
     // varialbles declaration
     const dropdown = document.getElementById("board-size");
-    let boardSize = "8x8";
+    const TILE_STATUSES = {
+        HIDDEN: 'hidden',
+        MINE: 'mine',
+        NUMBER: 'number',
+        MARKED: 'marked'
+    }
+    let board;
+    let boardSize = 8;
     let width = 10;
     let height = 10;
     let bombAmount = 20;
@@ -20,7 +27,13 @@ document.addEventListener('DOMContentLoaded',() =>{
     // initialize the game, the first move will always safe
     function init(){
         setBoardSize();
-        createBoard();
+        board = createBoard(boardSize, bombAmount);
+        const boardElement = document.querySelector('.board');
+        board.forEach(row => {
+            row.forEach(tile =>{
+                boardElement.append(tile.element);
+            })
+        })
     };
 
     // set the size to the board
@@ -31,9 +44,20 @@ document.addEventListener('DOMContentLoaded',() =>{
     }
 
     // main function to create the board
-    function createBoard(boardSize){
-        let board = document.getElementById("board");
-        board.appendChild(document.createElement('button'));
+    function createBoard(boardSize, numberOfMines){
+        const board = [];
+        for(let x = 0; x < boardSize; x++){
+            const row = [];
+            const element = document.createElement('div');
+            element.dataset.status = TILE_STATUSES.HIDDEN;
+            for(let y = 0; y < boardSize; y++){
+                const tile = {element, x, y};
+            }
+            row.push(tile);
+        }
+        board.push(row);
+
+        return board;
     };
 
     // function to draw the board
