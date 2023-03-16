@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded',() =>{
     let boardSize = 8;
     let width = 10;
     let height = 10;
-    let bombAmount = 20;
+    let bombAmount = 10;
     let flags = 0;
     let squares = [];
     let isGameOver = false;
-
+    
     // initialize the game, the first move will always safe
     function init(){
         setBoardSize();
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded',() =>{
     }
 
     // main function to create the board
-    function createBoard(boardSize, numberOfMines){
+    function createBoard(boardSize, bombAmount){
         const board = [];
         for(let x = 0; x < boardSize; x++){
             const row = [];
@@ -85,4 +85,33 @@ document.addEventListener('DOMContentLoaded',() =>{
     function drawFlags(position){
         this.position = position;
     };
+
+    //function to generate Mines positions
+    function getMinepositions(boardSize, bombAmount){
+        const positions = []
+
+        //Loop until enough Mines
+        while (positions.length < bombAmount){ 
+            const position = {
+                x: random(boardSize),
+                y: random(boardSize),
+            }
+
+            if (!positions.some(p => positionMatch(p,position))){
+                positions.push(position)
+            }
+        }
+
+        return positions
+    }
+
+    //return true if the two positions are the same
+    function positionMatch(a,b){
+        return a.x === b.x && a.y === b.y
+    }
+
+    //return a random integer
+    function random(boardSize){ 
+        return Math.floor(Math.random() * boardSize)
+    }
 })
