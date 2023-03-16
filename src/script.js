@@ -4,7 +4,7 @@
         // a. reveal titles
     // 3. Right click on titles
         // a. Mark tiles
-    // check for win/lose
+    // 4. check for win/lose
 
 document.addEventListener('DOMContentLoaded',() =>{
     // varialbles declaration
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded',() =>{
     // main function to create the board
     function createBoard(boardSize){
         let board = document.getElementById("board");
-        board.appendChild(document.createElement('button'))
+        board.appendChild(document.createElement('button'));
     };
 
     // function to draw the board
