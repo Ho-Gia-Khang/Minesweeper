@@ -4,7 +4,7 @@
         // a. reveal titles (Done)
     // 3. Right click on titles
         // a. Mark tiles (Partially done)
-    // 4. check for win/lose
+    // 4. check for win/lose ngu
 
 document.addEventListener('DOMContentLoaded',() =>{
     // varialbles declaration
