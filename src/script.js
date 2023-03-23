@@ -1,5 +1,5 @@
 // danh sach cong viec du kien:
-// 1. Populate a board with tiles/mines
+// 1. Populate a board with tiles/mines (done)
 // 2. Left click on the titles
     // a. reveal titles (Done)
 // 3. Right click on titles
@@ -14,19 +14,67 @@ const TILE_STATUSES = {
 }
 
 // initialize the game, the first move will always safe
-function init(){
-    // varialbles declaration
-    const BOARD_SIZE = setBoardSize();
-    const NUMBER_OF_MINES = 20
 
-    const board = createBoard(BOARD_SIZE, NUMBER_OF_MINES)
-    const boardElement = document.querySelector(".board")
-    const minesLeftText = document.querySelector("[data-mine-count]")
-    const messageText = document.querySelector(".subtext")
+// varialbles declaration
+let boardSize = 8;
+let data;
+const NUMBER_OF_MINES = 10;
+
+let board = createBoard(boardSize, NUMBER_OF_MINES)
+const boardElement = document.querySelector(".board");
+const minesLeftText = document.querySelector("[data-mine-count]")
+const messageText = document.querySelector(".subtext");
+
+minesLeftText.textContent = NUMBER_OF_MINES;
+generate(board, boardElement);
+
+// change the board size
+const dropdown = document.getElementById('board-size');
+dropdown.addEventListener('change', (e) => {
+    data = e.target.value;
+    console.log(data);
+    switch(data){
+        case '8x8':
+            boardSize = 8;
+            break;
+        case '16x16':
+            boardSize = 16;
+            break;
+    }
+
+    const board = createBoard(boardSize, NUMBER_OF_MINES)
+    const boardElement = document.querySelector(".board");
     
+    render(board, boardElement);
+});
+
+// generate the board
+function generate(board, boardElement){
     board.forEach(row => {
         row.forEach(tile => {
-            console.log(tile)
+            boardElement.append(tile.element)
+            tile.element.addEventListener("click", () => {
+                revealTile(board, tile)
+                //checkGameEnd()
+                if(tile.status=== TILE_STATUSES.MINE){
+                    alert('You lose');
+                }
+            })
+            tile.element.addEventListener("contextmenu", e => {
+                e.preventDefault()
+                markTile(tile)
+                //listMinesLeft()
+            })
+        })
+    })
+    boardElement.style.setProperty("--size", boardSize);
+}
+
+// re-render the board 
+function render(board, boardElement){
+    document.getElementById('board').innerText = '';
+    board.forEach(row => {
+        row.forEach(tile => {
             boardElement.append(tile.element)
             tile.element.addEventListener("click", () => {
                 revealTile(board, tile)
@@ -39,48 +87,41 @@ function init(){
             })
         })
     })
-    boardElement.style.setProperty("--size", BOARD_SIZE)
-    minesLeftText.textContent = NUMBER_OF_MINES
+    boardElement.style.setProperty("--size", boardSize);
 }
 
-// set the size to the board
-function setBoardSize(){
-    const boardSize = 10;
-    // dropdown.addEventListener('change', (e) => {
-    //     boardSize = e.target.value;
-    // });
-    return boardSize;
-}
-
-export function createBoard(boardSize, numberOfMines){
-    const board = []
-    const minePositions = getMinePositions(boardSize, numberOfMines)
+// function to create the board
+function createBoard(boardSize, numberOfMines){
+    const board = [];
+    console.log(boardSize);
+    const minePositions = getMinePositions(boardSize, numberOfMines);
 
     for (let x = 0; x < boardSize; x++) {
-        const row = []
+        const row = [];
+
         for (let y = 0; y < boardSize; y++) {
-        const element = document.createElement("div")
-        element.dataset.status = TILE_STATUSES.HIDDEN
+            const element = document.createElement("div");
+            element.dataset.status = TILE_STATUSES.HIDDEN;
 
-        const tile = {
-            element,
-            x,
-            y,
-            mine: minePositions.some(positionMatch.bind(null, { x, y })),
-            get status() {
-            return this.element.dataset.status
-            },
-            set status(value) {
-            this.element.dataset.status = value
-            },
-        }
+            const tile = {
+                element,
+                x,
+                y,
+                mine: minePositions.some(positionMatch.bind(null, { x, y })),
+                get status() {
+                    return this.element.dataset.status
+                },
+                set status(value) {
+                    this.element.dataset.status = value
+                },
+            };
 
-        row.push(tile)
+            row.push(tile)
         }
-        board.push(row)
+        board.push(row);
     }
 
-    return board
+    return board;
 };
 
 // function to mark tile 
@@ -164,4 +205,4 @@ function random(size){
     return Math.floor(Math.random() * size);
 }
 
-init()
+//gameLoop();
