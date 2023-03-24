@@ -199,3 +199,53 @@ function positionMatch(a,b){
 function random(size){ 
     return Math.floor(Math.random() * size);
 }
+
+//function to check game is over
+function checkGameEnd() {
+    const win = checkWin(board)
+    const lose = checkLose(board)
+    //Ngăn người dùng thao tác thêm
+    if (win || lose) {
+        boardElement.addEventListener('click', stopProp, {capture: true})
+        boardElement.addEventListener('contextmenu', stopProp, {capture: true})
+    }
+    //Thắng
+    if (win) {
+        messageText.textContent = "You Win !!!"
+    }
+    //Thua
+    if (lose) {
+        messageText.textContent = "You Lost :<<"
+        //Hàm này để hiện tất cả các mìn
+        board.forEach(row => {
+            row.forEach(tile => {
+                if(tile.status === TILE_STATUSES.MARKED) markTile(tile)
+                if(tile.mine) revealTile(board,tile)
+           }) 
+        })
+    }
+}
+
+function stopProp(e) {
+    e.stopImmediatePropagation()
+}
+//Thắng
+function checkWin (board) {
+    return board.every(row => {
+        return row.every(tile => {
+            return tile.status === TILE_STATUSES.NUMBER || 
+            (tile.mine && // Nói tóm gọn là nếu số mìn bị dấu = số mìn ban đầu khi đã hết lượt bấm thì thắng
+                (tile.status === TILE_STATUSES.HIDDEN ||
+                    tile.status === TILE_STATUSES.MARKED))
+        })
+    })
+
+}
+ //Thua
+function checkLose (board) {
+    return board.some(row => {
+        return row.some(tile => {
+            return tile.status === TILE_STATUSES.MINE //Có mìn thì thua
+        })
+    })
+}
