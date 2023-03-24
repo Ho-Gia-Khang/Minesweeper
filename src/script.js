@@ -13,22 +13,21 @@ const TILE_STATUSES = {
     MARKED: "marked"
 }
 
-// initialize the game, the first move will always safe
-
 // varialbles declaration
 let boardSize = 8;
-let data;
 const NUMBER_OF_MINES = 10;
 
-let board = createBoard(boardSize, NUMBER_OF_MINES)
+const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
 const minesLeftText = document.querySelector("[data-mine-count]")
 const messageText = document.querySelector(".subtext");
 
 minesLeftText.textContent = NUMBER_OF_MINES;
-generate(board, boardElement);
+// initialize the game, the first move will always safe
+generate(board, boardElement, boardSize);
 
 // change the board size
+let data;
 const dropdown = document.getElementById('board-size');
 dropdown.addEventListener('change', (e) => {
     data = e.target.value;
@@ -42,14 +41,14 @@ dropdown.addEventListener('change', (e) => {
             break;
     }
 
-    const board = createBoard(boardSize, NUMBER_OF_MINES)
+    const board = createBoard(boardSize, NUMBER_OF_MINES);
     const boardElement = document.querySelector(".board");
     
-    render(board, boardElement);
+    render(board, boardElement, boardSize);
 });
 
 // generate the board
-function generate(board, boardElement){
+function generate(board, boardElement, boardSize){
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element)
@@ -71,18 +70,18 @@ function generate(board, boardElement){
 }
 
 // re-render the board 
-function render(board, boardElement){
-    document.getElementById('board').innerText = '';
+function render(board, boardElement, boardSize){
+    document.getElementById('board').innerText = ''; // delete the old board
     board.forEach(row => {
         row.forEach(tile => {
-            boardElement.append(tile.element)
+            boardElement.append(tile.element);
             tile.element.addEventListener("click", () => {
-                revealTile(board, tile)
+                revealTile(board, tile);
                 //checkGameEnd()
             })
             tile.element.addEventListener("contextmenu", e => {
-                e.preventDefault()
-                markTile(tile)
+                e.preventDefault();
+                markTile(tile);
                 //listMinesLeft()
             })
         })
@@ -93,7 +92,6 @@ function render(board, boardElement){
 // function to create the board
 function createBoard(boardSize, numberOfMines){
     const board = [];
-    console.log(boardSize);
     const minePositions = getMinePositions(boardSize, numberOfMines);
 
     for (let x = 0; x < boardSize; x++) {
@@ -204,5 +202,3 @@ function positionMatch(a,b){
 function random(size){ 
     return Math.floor(Math.random() * size);
 }
-
-//gameLoop();

@@ -25,8 +25,8 @@
   .board {
     display: grid;
     padding: 10px;
-    grid-template-columns: repeat(var(--size), 60px);
-    grid-template-rows: repeat(var(--size), 60px);
+    grid-template-columns: repeat(var(--size), 40px);
+    grid-template-rows: repeat(var(--size), 40px);
     gap: 4px;
     background-color: #777;
   }
