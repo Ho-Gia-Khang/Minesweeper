@@ -15,7 +15,7 @@ const TILE_STATUSES = {
 
 // varialbles declaration
 let boardSize = 8;
-const NUMBER_OF_MINES = 10;
+const NUMBER_OF_MINES = 20;
 
 const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
