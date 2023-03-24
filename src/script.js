@@ -53,13 +53,13 @@ function generate(board, boardElement, boardSize){
         row.forEach(tile => {
             boardElement.append(tile.element)
             tile.element.addEventListener("click", () => {
-                revealTile(board, tile)
-                checkGameEnd()
+                revealTile(board, tile);
+                checkGameEnd();
             })
             tile.element.addEventListener("contextmenu", e => {
-                e.preventDefault()
-                markTile(tile)
-                //listMinesLeft()
+                e.preventDefault();
+                markTile(tile);
+                //listMinesLeft();
             })
         })
     })
@@ -74,7 +74,7 @@ function render(board, boardElement, boardSize){
             boardElement.append(tile.element);
             tile.element.addEventListener("click", () => {
                 revealTile(board, tile);
-                //checkGameEnd()
+                checkGameEnd()
             })
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
