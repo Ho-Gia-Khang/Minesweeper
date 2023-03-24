@@ -4,7 +4,7 @@
     // a. reveal titles (Done)
 // 3. Right click on titles
     // a. Mark tiles (Partially done)
-// 4. check for win/lose
+// 4. check for win/lose (Done)
 
 const TILE_STATUSES = {
     HIDDEN: "hidden",
@@ -54,10 +54,7 @@ function generate(board, boardElement, boardSize){
             boardElement.append(tile.element)
             tile.element.addEventListener("click", () => {
                 revealTile(board, tile)
-                //checkGameEnd()
-                if(tile.status=== TILE_STATUSES.MINE){
-                    alert('You lose');
-                }
+                checkGameEnd()
             })
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault()
