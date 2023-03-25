@@ -264,3 +264,14 @@ function checkLose (board) {
         })
     })
 }
+
+//Reset cái page lại
+function resetGame() {
+    location.reload();
+  }
+  
+const resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", function() {
+    location.reload();
+});
+  

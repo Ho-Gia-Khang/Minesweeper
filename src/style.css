@@ -58,3 +58,18 @@
   .board > [data-status="marked"] {
     background-image: url("/gfx/amongus_potion.png");
   }
+
+  #reset-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #reset-button:hover {
+    background-color: #bbb;
+  }
