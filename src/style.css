@@ -48,7 +48,7 @@
   }
   
   .board > [data-status="mine"] {
-    background-color: red;
+    background-image: url("/gfx/amongus_drip.jpg");
   }
   
   .board > [data-status="number"] {
@@ -56,5 +56,5 @@
   }
   
   .board > [data-status="marked"] {
-    background-color: yellow;
+    background-image: url("/gfx/amongus_potion.png");
   }

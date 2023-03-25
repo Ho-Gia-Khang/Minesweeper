@@ -23,6 +23,9 @@ const minesLeftText = document.querySelector("[data-mine-count]")
 const messageText = document.querySelector(".subtext");
 
 minesLeftText.textContent = NUMBER_OF_MINES;
+
+const startSound = new Audio("/sfx/Among-Us-Role-Reveal-Sound-Effect.mp3");
+const lostSound = new Audio("/sfx/Among-Us-Reporting-Body-Sound-Affect.mp3");
 // initialize the game, the first move will always safe
 generate(board, boardElement, boardSize);
 
@@ -49,6 +52,8 @@ dropdown.addEventListener('change', (e) => {
 
 // generate the board
 function generate(board, boardElement, boardSize){
+    startSound.play();
+    lostSound.pause();
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element)
@@ -68,7 +73,9 @@ function generate(board, boardElement, boardSize){
 
 // re-render the board 
 function render(board, boardElement, boardSize){
+    startSound.pause();
     document.getElementById('board').innerText = ''; // delete the old board
+    startSound.play();
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element);
@@ -84,6 +91,7 @@ function render(board, boardElement, boardSize){
         })
     })
     boardElement.style.setProperty("--size", boardSize);
+    startSound.play();
 }
 
 // function to create the board
@@ -115,7 +123,7 @@ function createBoard(boardSize, numberOfMines){
         }
         board.push(row);
     }
-
+    
     return board;
 };
 
@@ -215,6 +223,7 @@ function checkGameEnd() {
     }
     //Thua
     if (lose) {
+        startSound.pause();
         messageText.textContent = "You Lost :<<"
         //Hàm này để hiện tất cả các mìn
         board.forEach(row => {
@@ -223,6 +232,7 @@ function checkGameEnd() {
                 if(tile.mine) revealTile(board,tile)
            }) 
         })
+        lostSound.play();
     }
 }
 
