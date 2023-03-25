@@ -15,17 +15,20 @@ const TILE_STATUSES = {
 
 // varialbles declaration
 let boardSize = 8;
-const NUMBER_OF_MINES = 20;
+let NUMBER_OF_MINES = 20;
 
 const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
-const minesLeftText = document.querySelector("[data-mine-count]")
+const minesLeftText = document.querySelector("[data-mine-count]");
 const messageText = document.querySelector(".subtext");
 
 minesLeftText.textContent = NUMBER_OF_MINES;
 
 const startSound = new Audio("/sfx/Among-Us-Role-Reveal-Sound-Effect.mp3");
+startSound.volume = 0.5;
 const lostSound = new Audio("/sfx/Among-Us-Reporting-Body-Sound-Affect.mp3");
+lostSound.volume = 0.5;
+
 // initialize the game, the first move will always safe
 generate(board, boardElement, boardSize);
 
@@ -38,9 +41,11 @@ dropdown.addEventListener('change', (e) => {
     switch(data){
         case '8x8':
             boardSize = 8;
+            NUMBER_OF_MINES = 20;
             break;
         case '16x16':
             boardSize = 16;
+            NUMBER_OF_MINES = 40;
             break;
     }
 
@@ -53,7 +58,6 @@ dropdown.addEventListener('change', (e) => {
 // generate the board
 function generate(board, boardElement, boardSize){
     startSound.play();
-    lostSound.pause();
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element)
@@ -74,8 +78,9 @@ function generate(board, boardElement, boardSize){
 // re-render the board 
 function render(board, boardElement, boardSize){
     startSound.pause();
+    lostSound.pause();
     document.getElementById('board').innerText = ''; // delete the old board
-    startSound.play();
+    // render the new board
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element);
