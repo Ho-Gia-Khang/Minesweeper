@@ -45,12 +45,13 @@ dropdown.addEventListener('change', (e) => {
             break;
         case '16x16':
             boardSize = 16;
-            NUMBER_OF_MINES = 40;
+            NUMBER_OF_MINES = 80;
             break;
     }
 
     const board = createBoard(boardSize, NUMBER_OF_MINES);
     const boardElement = document.querySelector(".board");
+    minesLeftText.textContent = NUMBER_OF_MINES;
     
     render(board, boardElement, boardSize);
 });
@@ -274,4 +275,3 @@ const resetButton = document.getElementById("reset-button");
 resetButton.addEventListener("click", function() {
     location.reload();
 });
-  

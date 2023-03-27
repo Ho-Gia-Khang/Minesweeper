@@ -9,6 +9,8 @@
     align-items: center;
     flex-direction: column;
     color: white;
+    font-family: Arial;
+    color: #CCC;
   }
   
   .title {
@@ -17,7 +19,6 @@
   }
   
   .subtext {
-    color: #CCC;
     font-size: 1.5rem;
     margin-bottom: 10px;
   }
@@ -72,4 +73,14 @@
   
   #reset-button:hover {
     background-color: #bbb;
+  }
+
+  .controll{
+    color: #CCC;
+    font-size: 20px;
+  }
+
+  .board-size{
+    background-color: lightgray;
+    font-size: 20px;
   }
