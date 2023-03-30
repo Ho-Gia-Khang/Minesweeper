@@ -69,7 +69,7 @@ function generate(board, boardElement, boardSize){
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
                 markTile(tile);
-                //listMinesLeft();
+                listMinesLeft();
             })
         })
     })
@@ -85,6 +85,7 @@ function render(board, boardElement, boardSize){
     board.forEach(row => {
         row.forEach(tile => {
             boardElement.append(tile.element);
+            tile.status = TILE_STATUSES.HIDDEN;
             tile.element.addEventListener("click", () => {
                 revealTile(board, tile);
                 checkGameEnd()
@@ -92,7 +93,7 @@ function render(board, boardElement, boardSize){
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
                 markTile(tile);
-                //listMinesLeft()
+                listMinesLeft()
             })
         })
     })
@@ -183,6 +184,16 @@ function adjacentTiles(board, {x,y}){
     }
 
     return tiles
+}
+
+function listMinesLeft(){
+    const markedTilesCount = board.reduce((count, row) => {
+        return (
+            count + row.filter(tile => tile.status === TILE_STATUSES.MARKED).length
+        );
+    }, 0);
+
+    minesLeftText.textContent = NUMBER_OF_MINES - markedTilesCount;
 }
 
 //function to generate Mines positions
