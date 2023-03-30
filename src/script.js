@@ -4,6 +4,7 @@
     // a. reveal titles (Done)
 // 3. Right click on titles
     // a. Mark tiles (Partially done)
+    // b. Decrease the number of mines left on the display
 // 4. check for win/lose (Partially Done)
 
 const TILE_STATUSES = {
