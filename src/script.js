@@ -45,14 +45,14 @@ dropdown.addEventListener('change', (e) => {
             break;
         case '16x16':
             boardSize = 16;
-            NUMBER_OF_MINES = 80;
+            NUMBER_OF_MINES = 60;
             break;
     }
 
     const board = createBoard(boardSize, NUMBER_OF_MINES);
     const boardElement = document.querySelector(".board");
     minesLeftText.textContent = NUMBER_OF_MINES;
-    
+
     render(board, boardElement, boardSize);
 });
 
@@ -64,12 +64,11 @@ function generate(board, boardElement, boardSize){
             boardElement.append(tile.element)
             tile.element.addEventListener("click", () => {
                 revealTile(board, tile);
-                checkGameEnd();
+                checkGameEnd(board);
             })
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
                 markTile(tile);
-                //listMinesLeft();
             })
         })
     })
@@ -82,22 +81,7 @@ function render(board, boardElement, boardSize){
     lostSound.pause();
     document.getElementById('board').innerText = ''; // delete the old board
     // render the new board
-    board.forEach(row => {
-        row.forEach(tile => {
-            boardElement.append(tile.element);
-            tile.element.addEventListener("click", () => {
-                revealTile(board, tile);
-                checkGameEnd()
-            })
-            tile.element.addEventListener("contextmenu", e => {
-                e.preventDefault();
-                markTile(tile);
-                //listMinesLeft()
-            })
-        })
-    })
-    boardElement.style.setProperty("--size", boardSize);
-    startSound.play();
+    generate(board,boardElement,boardSize);
 }
 
 // function to create the board
@@ -215,7 +199,7 @@ function random(size){
 }
 
 //function to check game is over
-function checkGameEnd() {
+function checkGameEnd(board) {
     const win = checkWin(board)
     const lose = checkLose(board)
     //Ngăn người dùng thao tác thêm
