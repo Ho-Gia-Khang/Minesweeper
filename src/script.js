@@ -15,7 +15,7 @@ const TILE_STATUSES = {
 
 // varialbles declaration
 let boardSize = 8;
-let NUMBER_OF_MINES = 20;
+let NUMBER_OF_MINES = 15;
 
 const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
@@ -41,11 +41,11 @@ dropdown.addEventListener('change', (e) => {
     switch(data){
         case '8x8':
             boardSize = 8;
-            NUMBER_OF_MINES = 20;
+            NUMBER_OF_MINES = 15;
             break;
         case '16x16':
             boardSize = 16;
-            NUMBER_OF_MINES = 60;
+            NUMBER_OF_MINES = 40;
             break;
     }
 
