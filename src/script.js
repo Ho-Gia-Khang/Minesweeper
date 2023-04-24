@@ -71,7 +71,7 @@ function generate(board, boardElement, boardSize){
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
                 markTile(tile);
-                listMinesLeft();
+                listMinesLeft(board);
             })
         })
     })
@@ -173,7 +173,7 @@ function adjacentTiles(board, {x,y}){
 }
 
 // display the number of mine left
-function listMinesLeft(){
+function listMinesLeft(board){
     const markedTilesCount = board.reduce((count, row) => {
         return (
             count + row.filter(tile => tile.status === TILE_STATUSES.MARKED).length
