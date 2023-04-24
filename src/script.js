@@ -4,6 +4,7 @@
     // a. reveal titles (Done)
 // 3. Right click on titles
     // a. Mark tiles (Partially done)
+    // b. Decrease the number of mines left on the display
 // 4. check for win/lose (Partially Done)
 
 const TILE_STATUSES = {
@@ -69,6 +70,7 @@ function generate(board, boardElement, boardSize){
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
                 markTile(tile);
+                listMinesLeft();
             })
         })
     })
@@ -167,6 +169,17 @@ function adjacentTiles(board, {x,y}){
     }
 
     return tiles
+}
+
+// display the number of mine left
+function listMinesLeft(){
+    const markedTilesCount = board.reduce((count, row) => {
+        return (
+            count + row.filter(tile => tile.status === TILE_STATUSES.MARKED).length
+        );
+    }, 0);
+
+    minesLeftText.textContent = NUMBER_OF_MINES - markedTilesCount;
 }
 
 //function to generate Mines positions
