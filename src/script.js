@@ -49,6 +49,11 @@ dropdown.addEventListener('change', (e) => {
             boardSize = 16;
             NUMBER_OF_MINES = 40;
             break;
+        case '20x20':
+            boardSize = 20;
+            NUMBER_OF_MINES = 65;
+            break;          
+            
     }
 
     const board = createBoard(boardSize, NUMBER_OF_MINES);
@@ -224,6 +229,7 @@ function checkGameEnd(board) {
     //Thắng
     if (win) {
         messageText.textContent = "You Win !!!"
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     }
     //Thua
     if (lose) {
