@@ -23,6 +23,7 @@ const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
 const minesLeftText = document.querySelector("[data-mine-count]");
 const messageText = document.querySelector(".subtext");
+const moveHistory = [];
 
 minesLeftText.textContent = NUMBER_OF_MINES;
 
@@ -126,40 +127,87 @@ function createBoard(boardSize, numberOfMines){
 };
 
 // function to mark tile 
-function markTile(tile){
-    if(tile.status !== TILE_STATUSES.HIDDEN && 
-        tile.status !== TILE_STATUSES.MARKED){
-        return //end if it's already reveal
-    }
+// function markTile(tile){
+//     if(tile.status !== TILE_STATUSES.HIDDEN && 
+//         tile.status !== TILE_STATUSES.MARKED){
+//         return //end if it's already reveal
+//     }
 
-    if (tile.status === TILE_STATUSES.MARKED){
-        tile.status = TILE_STATUSES.HIDDEN //if it's marked unmark it
-    }
-    else {tile.status = TILE_STATUSES.MARKED} //mark it otherwise
+//     if (tile.status === TILE_STATUSES.MARKED){
+//         tile.status = TILE_STATUSES.HIDDEN //if it's marked unmark it
+//     }
+//     else {tile.status = TILE_STATUSES.MARKED} //mark it otherwise
+// }
+function markTile(tile) {
+    if (
+        tile.status !== TILE_STATUSES.HIDDEN &&
+        tile.status !== TILE_STATUSES.MARKED
+      ) {
+        return;
+      }
+    
+      const statusBefore = tile.status;
+      const contentBefore = tile.element.textContent;
+    
+      if (tile.status === TILE_STATUSES.MARKED) {
+        tile.status = TILE_STATUSES.HIDDEN;
+      } else {
+        tile.status = TILE_STATUSES.MARKED;
+      }
+    
+      // Add the move to the moveHistory array
+      moveHistory.push({ tile, statusBefore, contentBefore });
 }
+
 
 //function to reveal the clicked tile
-function revealTile(board, tile){
-    if (tile.status !== TILE_STATUSES.HIDDEN){
-        return //end if tile is already reveal
-    }
+// function revealTile(board, tile){
+//     if (tile.status !== TILE_STATUSES.HIDDEN){
+//         return //end if tile is already reveal
+//     }
 
-    if(tile.mine){
+//     if(tile.mine){
+//         tile.status = TILE_STATUSES.MINE;
+//         return //end if the tile is a mine
+//     }
+
+//     tile.status = TILE_STATUSES.NUMBER;
+//     const nearbyTiles = adjacentTiles(board,tile);
+//     const mines = nearbyTiles.filter(t => t.mine);
+
+//     if (mines.length === 0){ //reveal nearby tiles that are not adjacent to any mines
+//         nearbyTiles.forEach(revealTile.bind(null,board));
+//     }
+//     else{ //show number of mines nearby
+//         tile.element.textContent = mines.length;
+//     }
+// }
+function revealTile(board, tile) {
+    if (tile.status !== TILE_STATUSES.HIDDEN) {
+        return;
+      }
+    
+      if (tile.mine) {
         tile.status = TILE_STATUSES.MINE;
-        return //end if the tile is a mine
-    }
-
-    tile.status = TILE_STATUSES.NUMBER;
-    const nearbyTiles = adjacentTiles(board,tile);
-    const mines = nearbyTiles.filter(t => t.mine);
-
-    if (mines.length === 0){ //reveal nearby tiles that are not adjacent to any mines
-        nearbyTiles.forEach(revealTile.bind(null,board));
-    }
-    else{ //show number of mines nearby
+        return;
+      }
+    
+      const statusBefore = tile.status;
+      const contentBefore = tile.element.textContent;
+      tile.status = TILE_STATUSES.NUMBER;
+      const nearbyTiles = adjacentTiles(board, tile);
+      const mines = nearbyTiles.filter((t) => t.mine);
+    
+      if (mines.length === 0) {
+        nearbyTiles.forEach(revealTile.bind(null, board));
+      } else {
         tile.element.textContent = mines.length;
-    }
+      }
+    
+      // Add the move to the moveHistory array
+      moveHistory.push({ tile, statusBefore, contentBefore });
 }
+
 
 // function to calculate the number of bombs surround the square
 function adjacentTiles(board, {x,y}){
@@ -279,3 +327,20 @@ const resetButton = document.getElementById("reset-button");
 resetButton.addEventListener("click", function() {
     location.reload();
 });
+
+const undoButton = document.getElementById("undo-button");
+undoButton.addEventListener("click", undoMove);
+
+function undoMove() {
+    if (moveHistory.length === 0) {
+        return;
+      }
+    
+      const lastMove = moveHistory.pop();
+      const { tile, statusBefore, contentBefore } = lastMove;
+      tile.status = statusBefore;
+      tile.element.textContent = contentBefore;
+    
+      // Check game end after undoing the move
+      checkGameEnd(board);
+}
