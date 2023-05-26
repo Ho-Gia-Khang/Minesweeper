@@ -74,7 +74,6 @@ function generate(board, boardElement, boardSize){
                 revealTile(board, tile);
                 addMoveHistory();
                 checkGameEnd(board);
-                console.log(moveHistory)
             })
             tile.element.addEventListener("contextmenu", e => {
                 e.preventDefault();
@@ -128,18 +127,6 @@ function createBoard(boardSize, numberOfMines){
     return board;
 };
 
-// function to mark tile 
-// function markTile(tile){
-//     if(tile.status !== TILE_STATUSES.HIDDEN && 
-//         tile.status !== TILE_STATUSES.MARKED){
-//         return //end if it's already reveal
-//     }
-
-//     if (tile.status === TILE_STATUSES.MARKED){
-//         tile.status = TILE_STATUSES.HIDDEN //if it's marked unmark it
-//     }
-//     else {tile.status = TILE_STATUSES.MARKED} //mark it otherwise
-// }
 function markTile(tile) {
     if (
         tile.status !== TILE_STATUSES.HIDDEN &&
@@ -159,7 +146,6 @@ function markTile(tile) {
     
       // Add the move to the moveHistory array
       moveHistory.push({ tile, statusBefore, contentBefore });
-      console.log(moveHistory)
 }
 
 function revealTile(board, tile) {
