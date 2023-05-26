@@ -1,12 +1,12 @@
 // danh sach cong viec du kien:
 // 1. Populate a board with tiles/mines (done)
-// 2. Left click on the titles -> reveal titles (Done)
-// 3. Right click on titles:
-// 3a. Mark tiles (Partially done)
-// 3b. Decrease the number of mines left on the display (done)
+// 2. Left click on the titles
+// a. reveal titles (Done)
+// 3. Right click on titles
+// a. Mark tiles (Partially done)
+// b. Decrease the number of mines left on the display (done)
 // 4. check for win/lose (Partially Done)
 // 5. Make the first move to be always safe
-// 6. Make undo function
 
 const TILE_STATUSES = {
     HIDDEN: "hidden",
@@ -23,6 +23,7 @@ const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
 const minesLeftText = document.querySelector("[data-mine-count]");
 const messageText = document.querySelector(".subtext");
+const moveHistory = [];
 
 minesLeftText.textContent = NUMBER_OF_MINES;
 
@@ -38,7 +39,6 @@ generate(board, boardElement, boardSize);
 let data;
 const dropdown = document.getElementById("board-size");
 dropdown.addEventListener("change", (e) => {
-    win;
     data = e.target.value;
     console.log(data);
     switch (data) {
@@ -126,43 +126,84 @@ function createBoard(boardSize, numberOfMines) {
 }
 
 // function to mark tile
+// function markTile(tile){
+//     if(tile.status !== TILE_STATUSES.HIDDEN &&
+//         tile.status !== TILE_STATUSES.MARKED){
+//         return //end if it's already reveal
+//     }
+
+//     if (tile.status === TILE_STATUSES.MARKED){
+//         tile.status = TILE_STATUSES.HIDDEN //if it's marked unmark it
+//     }
+//     else {tile.status = TILE_STATUSES.MARKED} //mark it otherwise
+// }
 function markTile(tile) {
     if (
         tile.status !== TILE_STATUSES.HIDDEN &&
         tile.status !== TILE_STATUSES.MARKED
     ) {
-        return; //end if it's already reveal
+        return;
     }
 
+    const statusBefore = tile.status;
+    const contentBefore = tile.element.textContent;
+
     if (tile.status === TILE_STATUSES.MARKED) {
-        tile.status = TILE_STATUSES.HIDDEN; //if it's marked unmark it
+        tile.status = TILE_STATUSES.HIDDEN;
     } else {
         tile.status = TILE_STATUSES.MARKED;
-    } //mark it otherwise
+    }
+
+    // Add the move to the moveHistory array
+    moveHistory.push({ tile, statusBefore, contentBefore });
 }
 
 //function to reveal the clicked tile
+// function revealTile(board, tile){
+//     if (tile.status !== TILE_STATUSES.HIDDEN){
+//         return //end if tile is already reveal
+//     }
+
+//     if(tile.mine){
+//         tile.status = TILE_STATUSES.MINE;
+//         return //end if the tile is a mine
+//     }
+
+//     tile.status = TILE_STATUSES.NUMBER;
+//     const nearbyTiles = adjacentTiles(board,tile);
+//     const mines = nearbyTiles.filter(t => t.mine);
+
+//     if (mines.length === 0){ //reveal nearby tiles that are not adjacent to any mines
+//         nearbyTiles.forEach(revealTile.bind(null,board));
+//     }
+//     else{ //show number of mines nearby
+//         tile.element.textContent = mines.length;
+//     }
+// }
 function revealTile(board, tile) {
     if (tile.status !== TILE_STATUSES.HIDDEN) {
-        return; //end if tile is already reveal
+        return;
     }
 
     if (tile.mine) {
         tile.status = TILE_STATUSES.MINE;
-        return; //end if the tile is a mine
+        return;
     }
 
+    const statusBefore = tile.status;
+    const contentBefore = tile.element.textContent;
     tile.status = TILE_STATUSES.NUMBER;
     const nearbyTiles = adjacentTiles(board, tile);
     const mines = nearbyTiles.filter((t) => t.mine);
 
     if (mines.length === 0) {
-        //reveal nearby tiles that are not adjacent to any mines
         nearbyTiles.forEach(revealTile.bind(null, board));
     } else {
-        //show number of mines nearby
         tile.element.textContent = mines.length;
     }
+
+    // Add the move to the moveHistory array
+    moveHistory.push({ tile, statusBefore, contentBefore });
 }
 
 // function to calculate the number of bombs surround the square
@@ -289,3 +330,20 @@ const resetButton = document.getElementById("reset-button");
 resetButton.addEventListener("click", function () {
     location.reload();
 });
+
+const undoButton = document.getElementById("undo-button");
+undoButton.addEventListener("click", undoMove);
+
+function undoMove() {
+    if (moveHistory.length === 0) {
+        return;
+    }
+
+    const lastMove = moveHistory.pop();
+    const { tile, statusBefore, contentBefore } = lastMove;
+    tile.status = statusBefore;
+    tile.element.textContent = contentBefore;
+
+    // Check game end after undoing the move
+    checkGameEnd(board);
+}
