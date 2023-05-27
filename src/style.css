@@ -60,7 +60,7 @@
     background-image: url("/gfx/amongus_potion.png");
   }
 
-  #reset-button {
+  #reset-button, #undo-button {
     margin-top: 20px;
     padding: 10px 20px;
     background-color: #ddd;
@@ -71,7 +71,7 @@
     transition: background-color 0.3s ease;
   }
   
-  #reset-button:hover {
+  #reset-button:hover, #undo-button:hover {
     background-color: #bbb;
   }
 

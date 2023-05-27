@@ -16,11 +16,26 @@ const TILE_STATUSES = {
 };
 
 // varialbles declaration
-let boardSize = 8;
-let NUMBER_OF_MINES = 15;
+let boardSize;
+let NUMBER_OF_MINES;
+let savedBoardSize = parseInt(localStorage.getItem("boardSize"));
+let savedNumberOfMines = parseInt(localStorage.getItem("numberOfMines"));
+if (savedBoardSize) {
+    boardSize = savedBoardSize;
+} else {
+    boardSize = 8;
+}
+if (savedNumberOfMines) {
+    NUMBER_OF_MINES = savedNumberOfMines;
+} else {
+    NUMBER_OF_MINES = 15;
+}
 
-const board = createBoard(boardSize, NUMBER_OF_MINES);
-const boardElement = document.querySelector(".board");
+let win = false;
+let lose = false;
+
+let board = createBoard(boardSize, NUMBER_OF_MINES);
+let boardElement = document.querySelector(".board");
 const minesLeftText = document.querySelector("[data-mine-count]");
 const messageText = document.querySelector(".subtext");
 const moveHistory = [];
@@ -41,26 +56,38 @@ const dropdown = document.getElementById("board-size");
 dropdown.addEventListener("change", (e) => {
     data = e.target.value;
     console.log(data);
+    win = false;
+    lose = false;
     switch (data) {
         case "8x8":
             boardSize = 8;
             NUMBER_OF_MINES = 15;
+            console.log("win: " + win);
+            console.log("lose: " + lose);
             break;
         case "16x16":
             boardSize = 16;
             NUMBER_OF_MINES = 40;
+            console.log("win: " + win);
+            console.log("lose: " + lose);
             break;
         case "20x20":
             boardSize = 20;
             NUMBER_OF_MINES = 65;
+            console.log("win: " + win);
+            console.log("lose: " + lose);
             break;
     }
 
-    const board = createBoard(boardSize, NUMBER_OF_MINES);
-    const boardElement = document.querySelector(".board");
+    localStorage.setItem("boardSize", boardSize);
+    localStorage.setItem("numberOfMines", NUMBER_OF_MINES);
+
+    board = createBoard(boardSize, NUMBER_OF_MINES);
+    boardElement = document.querySelector(".board");
     minesLeftText.textContent = NUMBER_OF_MINES;
 
     render(board, boardElement, boardSize);
+    window.location.reload();
 });
 
 // generate the board
@@ -126,6 +153,14 @@ function createBoard(boardSize, numberOfMines) {
     return board;
 }
 
+const resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", function () {
+    location.reload();
+});
+
+const undoButton = document.getElementById("undo-button");
+undoButton.addEventListener("click", undoMove);
+
 function markTile(tile) {
     if (
         tile.status !== TILE_STATUSES.HIDDEN &&
@@ -152,11 +187,6 @@ function revealTile(board, tile) {
         return;
     }
 
-    if (tile.mine) {
-        tile.status = TILE_STATUSES.MINE;
-        return;
-    }
-
     const statusBefore = tile.status;
     const contentBefore = tile.element.textContent;
 
@@ -164,11 +194,16 @@ function revealTile(board, tile) {
     const nearbyTiles = adjacentTiles(board, tile);
     const mines = nearbyTiles.filter((t) => t.mine);
 
+    thisClickHistory.push({ tile, statusBefore, contentBefore });
+
+    if (tile.mine) {
+        tile.status = TILE_STATUSES.MINE;
+        return;
+    }
+
     if (mines.length === 0) {
-        thisClickHistory.push({ tile, statusBefore, contentBefore });
         nearbyTiles.forEach(revealTile.bind(null, board));
     } else {
-        thisClickHistory.push({ tile, statusBefore, contentBefore });
         tile.element.textContent = mines.length;
     }
 }
@@ -239,40 +274,10 @@ function random(size) {
     return Math.floor(Math.random() * size);
 }
 
-//function to check game is over
-function checkGameEnd(board) {
-    const win = checkWin(board);
-    const lose = checkLose(board);
-    //Ngăn người dùng thao tác thêm
-    if (win || lose) {
-        boardElement.addEventListener("click", stopProp, { capture: true });
-        boardElement.addEventListener("contextmenu", stopProp, {
-            capture: true,
-        });
-    }
-    //Thắng
-    if (win) {
-        messageText.textContent = "You Win !!!";
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-    }
-    //Thua
-    if (lose) {
-        startSound.pause();
-        messageText.textContent = "You Lost :<<";
-        //Hàm này để hiện tất cả các mìn
-        board.forEach((row) => {
-            row.forEach((tile) => {
-                if (tile.status === TILE_STATUSES.MARKED) markTile(tile);
-                if (tile.mine) revealTile(board, tile);
-            });
-        });
-        lostSound.play();
-    }
-}
+// function stopProp(e) {
+//     e.stopImmediatePropagation();
+// }
 
-function stopProp(e) {
-    e.stopImmediatePropagation();
-}
 //Thắng
 function checkWin(board) {
     return board.every((row) => {
@@ -286,6 +291,7 @@ function checkWin(board) {
         });
     });
 }
+
 //Thua
 function checkLose(board) {
     return board.some((row) => {
@@ -295,18 +301,45 @@ function checkLose(board) {
     });
 }
 
+//function to check game is over
+function checkGameEnd(board) {
+    win = checkWin(board);
+    lose = checkLose(board);
+    console.log("win: " + win);
+    console.log("lose: " + lose);
+    //Ngăn người dùng thao tác thêm
+    if (win || lose) {
+        // boardElement.addEventListener("click", stopProp, { capture: true });
+        // boardElement.addEventListener("contextmenu", stopProp, {
+        //     capture: true,
+        // });
+    }
+    //Thắng
+    if (win) {
+        messageText.textContent = "You Win !!!";
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    }
+    //Thua
+    else if (lose) {
+        startSound.pause();
+        messageText.textContent = "You Lost :<<";
+        //Hàm này để hiện tất cả các mìn
+        // board.forEach((row) => {
+        //     row.forEach((tile) => {
+        //         if (tile.status === TILE_STATUSES.MARKED) markTile(tile);
+        //         if (tile.mine) revealTile(board, tile);
+        //     });
+        // });
+        lostSound.play();
+    } else {
+        listMinesLeft(board);
+    }
+}
+
 //Reset cái page lại
 function resetGame() {
     location.reload();
 }
-
-const resetButton = document.getElementById("reset-button");
-resetButton.addEventListener("click", function () {
-    location.reload();
-});
-
-const undoButton = document.getElementById("undo-button");
-undoButton.addEventListener("click", undoMove);
 
 function undoMove() {
     if (moveHistory.length === 0) {
