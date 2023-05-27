@@ -33,7 +33,10 @@ if (savedNumberOfMines) {
 
 let win = false;
 let lose = false;
-let gameHasEnded = false;
+let canUndo = true;
+let hasUndoAfterLoss = false;
+let moveHistoryAfterLoss = [];
+
 
 let board = createBoard(boardSize, NUMBER_OF_MINES);
 let boardElement = document.querySelector(".board");
@@ -311,13 +314,6 @@ function checkGameEnd(board) {
     lose = checkLose(board);
     console.log("win: " + win);
     console.log("lose: " + lose);
-    //Ngăn người dùng thao tác thêm
-    if (win || lose) {
-        boardElement.addEventListener("click", stopProp, { capture: true });
-        boardElement.addEventListener("contextmenu", stopProp, {
-            capture: true,
-        });
-    }
     //Thắng
     if (win) {
         messageText.textContent = "You Win !!!";
@@ -325,11 +321,24 @@ function checkGameEnd(board) {
     }
     //Thua
     else if (lose) {
-        startSound.pause();
-        messageText.textContent = "You Lost :<<";
-        lostSound.play();
+        if (!hasUndoAfterLoss) {
+            messageText.textContent = "You Lost :<<, want to try again?";
+            hasUndoAfterLoss = true; 
+        } else {
+            canUndo = false;
+            startSound.pause();
+            messageText.textContent = "You Lost :<<";
+            lostSound.play();
+            boardElement.addEventListener("click", stopProp, { capture: true });
+            boardElement.addEventListener("contextmenu", stopProp, { capture: true });
+        }
+
+
     } else {
         listMinesLeft(board);
+        if (hasUndoAfterLoss) {
+            messageText.textContent = "Last chance, mines left: " + minesLeftText.textContent
+        }
     }
 }
 
@@ -343,17 +352,28 @@ function resetGame() {
 }
 
 function undoMove() {
-    if (moveHistory.length === 0 || gameHasEnded) {
+    if (moveHistory.length === 0) {
         return;
     }
 
-    const lastMove = moveHistory.pop();
+    if (canUndo) {
+        const lastMove = moveHistory.pop();
 
-    while (lastMove) {
-        const { tile, statusBefore, contentBefore } = lastMove.pop();
-        tile.status = statusBefore;
-        tile.element.textContent = contentBefore;
+        while (lastMove) {
+            const { tile, statusBefore, contentBefore } = lastMove.pop();
+            tile.status = statusBefore;
+            tile.element.textContent = contentBefore;
+        }
+    } else {
+        if (moveHistoryAfterLoss.length > 0) {
+            const lastMove = moveHistoryAfterLoss.pop();
+            while (lastMove) {
+                const { tile, statusBefore, contentBefore } = lastMove.pop();
+                tile.status = statusBefore;
+                tile.element.textContent = contentBefore;
+            }
+        }
     }
-    // Check game end after undoing the move
+
     checkGameEnd(board);
 }
