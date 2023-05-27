@@ -18,6 +18,8 @@ const TILE_STATUSES = {
 // varialbles declaration
 let boardSize = 8;
 let NUMBER_OF_MINES = 15;
+let gameHasEnded = false;
+
 
 const board = createBoard(boardSize, NUMBER_OF_MINES);
 const boardElement = document.querySelector(".board");
@@ -286,7 +288,6 @@ function checkWin (board) {
                     tile.status === TILE_STATUSES.MARKED))
         })
     })
-
 }
  //Thua
 function checkLose (board) {
@@ -311,18 +312,24 @@ const undoButton = document.getElementById("undo-button");
 undoButton.addEventListener("click", undoMove);
 
 function undoMove() {
-    if (moveHistory.length === 0) {
+    if (moveHistory.length === 0 || gameHasEnded) {
         return;
       }
 
       const lastMove =  moveHistory.pop();
 
-      while(lastMove){
+    while(lastMove){
         const { tile, statusBefore, contentBefore } = lastMove.pop()
         tile.status = statusBefore;
         tile.element.textContent = contentBefore;
-        }
-    
-      // Check game end after undoing the move
-      checkGameEnd(board);
+    }
+    // Check game end after undoing the move
+    checkGameEnd(board);
+
+    // Disable the "undo" button if the game has ended
+    if (gameHasEnded) {
+        undoButton.disabled = true;
+    } else {
+        undoButton.disabled = false;
+    }
 }
