@@ -33,6 +33,7 @@ if (savedNumberOfMines) {
 
 let win = false;
 let lose = false;
+let gameHasEnded = false;
 
 let board = createBoard(boardSize, NUMBER_OF_MINES);
 let boardElement = document.querySelector(".board");
@@ -59,6 +60,12 @@ dropdown.addEventListener("change", (e) => {
     win = false;
     lose = false;
     switch (data) {
+        case "0x0":
+            boardSize = 8;
+            NUMBER_OF_MINES = 15;
+            console.log("win: " + win);
+            console.log("lose: " + lose);
+            break;
         case "8x8":
             boardSize = 8;
             NUMBER_OF_MINES = 15;
@@ -87,6 +94,7 @@ dropdown.addEventListener("change", (e) => {
     minesLeftText.textContent = NUMBER_OF_MINES;
 
     render(board, boardElement, boardSize);
+    checkGameEnd(board);
     window.location.reload();
 });
 
@@ -116,6 +124,7 @@ function render(board, boardElement, boardSize) {
     startSound.pause();
     lostSound.pause();
     document.getElementById("board").innerText = ""; // delete the old board
+    messageText.textContent = "Mines left: " + minesLeftText.textContent;
     // render the new board
     generate(board, boardElement, boardSize);
 }
@@ -186,14 +195,12 @@ function revealTile(board, tile) {
     if (tile.status !== TILE_STATUSES.HIDDEN) {
         return;
     }
-
     const statusBefore = tile.status;
     const contentBefore = tile.element.textContent;
 
     tile.status = TILE_STATUSES.NUMBER;
     const nearbyTiles = adjacentTiles(board, tile);
     const mines = nearbyTiles.filter((t) => t.mine);
-
     thisClickHistory.push({ tile, statusBefore, contentBefore });
 
     if (tile.mine) {
@@ -243,6 +250,7 @@ function listMinesLeft(board) {
     }, 0);
 
     minesLeftText.textContent = NUMBER_OF_MINES - markedTilesCount;
+    messageText.textContent = "Mines left: " + minesLeftText.textContent;
 }
 
 //function to generate Mines positions
@@ -273,10 +281,6 @@ function positionMatch(a, b) {
 function random(size) {
     return Math.floor(Math.random() * size);
 }
-
-// function stopProp(e) {
-//     e.stopImmediatePropagation();
-// }
 
 //Thắng
 function checkWin(board) {
@@ -309,10 +313,10 @@ function checkGameEnd(board) {
     console.log("lose: " + lose);
     //Ngăn người dùng thao tác thêm
     if (win || lose) {
-        // boardElement.addEventListener("click", stopProp, { capture: true });
-        // boardElement.addEventListener("contextmenu", stopProp, {
-        //     capture: true,
-        // });
+        boardElement.addEventListener("click", stopProp, { capture: true });
+        boardElement.addEventListener("contextmenu", stopProp, {
+            capture: true,
+        });
     }
     //Thắng
     if (win) {
@@ -323,17 +327,22 @@ function checkGameEnd(board) {
     else if (lose) {
         startSound.pause();
         messageText.textContent = "You Lost :<<";
-        //Hàm này để hiện tất cả các mìn
-        // board.forEach((row) => {
-        //     row.forEach((tile) => {
-        //         if (tile.status === TILE_STATUSES.MARKED) markTile(tile);
-        //         if (tile.mine) revealTile(board, tile);
-        //     });
-        // });
+        // Hàm này để hiện tất cả các mìn
+        // board.forEach(row => {
+        //     row.forEach(tile => {
+        //         if(tile.status === TILE_STATUSES.MARKED) markTile(tile)
+        //         if(tile.mine) revealTile(board,tile)
+        //    })
+
+        // })
         lostSound.play();
     } else {
         listMinesLeft(board);
     }
+}
+
+function stopProp(e) {
+    e.stopImmediatePropagation();
 }
 
 //Reset cái page lại
@@ -342,7 +351,7 @@ function resetGame() {
 }
 
 function undoMove() {
-    if (moveHistory.length === 0) {
+    if (moveHistory.length === 0 || gameHasEnded) {
         return;
     }
 
@@ -353,7 +362,13 @@ function undoMove() {
         tile.status = statusBefore;
         tile.element.textContent = contentBefore;
     }
-
     // Check game end after undoing the move
     checkGameEnd(board);
+
+    // Disable the "undo" button if the game has ended
+    if (gameHasEnded) {
+        undoButton.disabled = true;
+    } else {
+        undoButton.disabled = false;
+    }
 }
