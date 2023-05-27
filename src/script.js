@@ -353,7 +353,6 @@ function undoMove() {
         boardElement.removeEventListener("contextmenu", stop, {
             capture: true,
         });
-        return;
     }
 
     const lastMove = moveHistory.pop();
