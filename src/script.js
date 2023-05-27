@@ -327,14 +327,6 @@ function checkGameEnd(board) {
     else if (lose) {
         startSound.pause();
         messageText.textContent = "You Lost :<<";
-        // Hàm này để hiện tất cả các mìn
-        // board.forEach(row => {
-        //     row.forEach(tile => {
-        //         if(tile.status === TILE_STATUSES.MARKED) markTile(tile)
-        //         if(tile.mine) revealTile(board,tile)
-        //    })
-
-        // })
         lostSound.play();
     } else {
         listMinesLeft(board);
@@ -364,11 +356,4 @@ function undoMove() {
     }
     // Check game end after undoing the move
     checkGameEnd(board);
-
-    // Disable the "undo" button if the game has ended
-    if (gameHasEnded) {
-        undoButton.disabled = true;
-    } else {
-        undoButton.disabled = false;
-    }
 }
