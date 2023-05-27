@@ -62,6 +62,7 @@ dropdown.addEventListener('change', (e) => {
     minesLeftText.textContent = NUMBER_OF_MINES;
 
     render(board, boardElement, boardSize);
+    checkGameEnd(board)
 });
 
 // generate the board
@@ -90,6 +91,7 @@ function render(board, boardElement, boardSize){
     startSound.pause();
     lostSound.pause();
     document.getElementById('board').innerText = ''; // delete the old board
+    messageText.textContent = "Mines left: " + minesLeftText.textContent
     // render the new board
     generate(board,boardElement,boardSize);
 }
@@ -152,12 +154,6 @@ function revealTile(board, tile) {
     if (tile.status !== TILE_STATUSES.HIDDEN) {
         return;
       }
-    
-      if (tile.mine) {
-        tile.status = TILE_STATUSES.MINE;
-        return;
-      }
-    
       const statusBefore = tile.status;
       const contentBefore = tile.element.textContent;
 
@@ -165,13 +161,19 @@ function revealTile(board, tile) {
       const nearbyTiles = adjacentTiles(board, tile);
       const mines = nearbyTiles.filter((t) => t.mine);
 
+      thisClickHistory.push({ tile, statusBefore, contentBefore })
+
+      if (tile.mine) {
+        tile.status = TILE_STATUSES.MINE;
+        return;
+      } 
+    
       if (mines.length === 0) {
-        thisClickHistory.push({ tile, statusBefore, contentBefore })
         nearbyTiles.forEach(revealTile.bind(null, board));
       } else {
-        thisClickHistory.push({ tile, statusBefore, contentBefore })
         tile.element.textContent = mines.length;
       }
+
 }
 
 // Add the move to the moveHistory array
@@ -206,6 +208,7 @@ function listMinesLeft(board){
     }, 0);
 
     minesLeftText.textContent = NUMBER_OF_MINES - markedTilesCount;
+    messageText.textContent = "Mines left: " + minesLeftText.textContent;
 }
 
 //function to generate Mines positions
@@ -243,8 +246,8 @@ function checkGameEnd(board) {
     const lose = checkLose(board)
     //Ngăn người dùng thao tác thêm
     if (win || lose) {
-        boardElement.addEventListener('click', stopProp, {capture: true})
-        boardElement.addEventListener('contextmenu', stopProp, {capture: true})
+        // boardElement.addEventListener('click', stopProp, {capture: true})
+        // boardElement.addEventListener('contextmenu', stopProp, {capture: true})
     }
     //Thắng
     if (win) {
@@ -255,14 +258,18 @@ function checkGameEnd(board) {
     if (lose) {
         startSound.pause();
         messageText.textContent = "You Lost :<<"
-        //Hàm này để hiện tất cả các mìn
-        board.forEach(row => {
-            row.forEach(tile => {
-                if(tile.status === TILE_STATUSES.MARKED) markTile(tile)
-                if(tile.mine) revealTile(board,tile)
-           }) 
-        })
+        // Hàm này để hiện tất cả các mìn
+        // board.forEach(row => {
+        //     row.forEach(tile => {
+        //         if(tile.status === TILE_STATUSES.MARKED) markTile(tile)
+        //         if(tile.mine) revealTile(board,tile)
+        //    }) 
+
+        // })
         lostSound.play();
+    }
+    else{
+        listMinesLeft(board)
     }
 }
 
@@ -307,7 +314,7 @@ function undoMove() {
     if (moveHistory.length === 0) {
         return;
       }
-    
+
       const lastMove =  moveHistory.pop();
 
       while(lastMove){
