@@ -199,27 +199,60 @@ function markTile(tile) {
 
 function revealTile(board, tile) {
     if (tile.status !== TILE_STATUSES.HIDDEN) {
-        return;
+      return;
     }
+  
     const statusBefore = tile.status;
     const contentBefore = tile.element.textContent;
-
+  
+    // Check if it's the first move
+    const isFirstMove = moveHistory.length === 0 && thisClickHistory.length === 0;
+  
+    if (isFirstMove && tile.mine) {
+      // If the first move is a mine, regenerate the board
+      regenerateBoard(board, tile);
+      return;
+    }
+  
     tile.status = TILE_STATUSES.NUMBER;
     const nearbyTiles = adjacentTiles(board, tile);
     const mines = nearbyTiles.filter((t) => t.mine);
     thisClickHistory.push({ tile, statusBefore, contentBefore });
-
+  
     if (tile.mine) {
-        tile.status = TILE_STATUSES.MINE;
-        return;
+      tile.status = TILE_STATUSES.MINE;
+      return;
     }
-
+  
     if (mines.length === 0) {
-        nearbyTiles.forEach(revealTile.bind(null, board));
+      nearbyTiles.forEach(revealTile.bind(null, board));
     } else {
-        tile.element.textContent = mines.length;
+      tile.element.textContent = mines.length;
     }
-}
+  }
+  
+  // Function to regenerate the board if the first move is a mine
+  function regenerateBoard(board, firstMineTile) {
+    const x = firstMineTile.x;
+    const y = firstMineTile.y;
+  
+    // Remove the mine from the first clicked tile
+    firstMineTile.mine = false;
+  
+    // Find a new position for the mine
+    let newMinePosition;
+    do {
+      newMinePosition = getMinePositions(1)[0];
+    } while (newMinePosition.x === x && newMinePosition.y === y);
+  
+    // Set the mine in the new position
+    const newMineTile = board[newMinePosition.x][newMinePosition.y];
+    newMineTile.mine = true;
+  
+    // Reveal the new position
+    revealTile(board, newMineTile);
+  }
+  
 
 // Add the move to the moveHistory array
 function addMoveHistory() {
