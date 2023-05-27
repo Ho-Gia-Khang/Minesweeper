@@ -18,30 +18,17 @@ const TILE_STATUSES = {
 // varialbles declaration
 let boardSize;
 let NUMBER_OF_MINES;
-let savedBoardSize = parseInt(localStorage.getItem("boardSize"));
-let savedNumberOfMines = parseInt(localStorage.getItem("numberOfMines"));
-if (savedBoardSize) {
-    boardSize = savedBoardSize;
-} else {
-    boardSize = 8;
-}
-if (savedNumberOfMines) {
-    NUMBER_OF_MINES = savedNumberOfMines;
-} else {
-    NUMBER_OF_MINES = 15;
-}
 
-let win = false;
-let lose = false;
-let gameHasEnded = false;
+let win;
+let lose;
+let gameHasEnded;
 
-let board = createBoard(boardSize, NUMBER_OF_MINES);
-let boardElement = document.querySelector(".board");
+let board;
+let boardElement;
 const minesLeftText = document.querySelector("[data-mine-count]");
 const messageText = document.querySelector(".subtext");
 const moveHistory = [];
 const thisClickHistory = [];
-minesLeftText.textContent = NUMBER_OF_MINES;
 
 const startSound = new Audio("/sfx/Among-Us-Role-Reveal-Sound-Effect.mp3");
 startSound.volume = 0.5;
@@ -49,7 +36,7 @@ const lostSound = new Audio("/sfx/Among-Us-Reporting-Body-Sound-Affect.mp3");
 lostSound.volume = 0.5;
 
 // initialize the game, the first move will always safe
-generate(board, boardElement, boardSize);
+start();
 
 // change the board size
 let data;
@@ -57,32 +44,22 @@ const dropdown = document.getElementById("board-size");
 dropdown.addEventListener("change", (e) => {
     data = e.target.value;
     console.log(data);
-    win = false;
-    lose = false;
     switch (data) {
         case "0x0":
             boardSize = 8;
             NUMBER_OF_MINES = 15;
-            console.log("win: " + win);
-            console.log("lose: " + lose);
             break;
         case "8x8":
             boardSize = 8;
             NUMBER_OF_MINES = 15;
-            console.log("win: " + win);
-            console.log("lose: " + lose);
             break;
         case "16x16":
             boardSize = 16;
             NUMBER_OF_MINES = 40;
-            console.log("win: " + win);
-            console.log("lose: " + lose);
             break;
         case "20x20":
             boardSize = 20;
             NUMBER_OF_MINES = 65;
-            console.log("win: " + win);
-            console.log("lose: " + lose);
             break;
     }
 
@@ -98,22 +75,51 @@ dropdown.addEventListener("change", (e) => {
     window.location.reload();
 });
 
+function start() {
+    const savedBoardSize = parseInt(localStorage.getItem("boardSize"));
+    const savedNumberOfMines = parseInt(localStorage.getItem("numberOfMines"));
+    if (savedBoardSize) {
+        boardSize = savedBoardSize;
+    } else {
+        boardSize = 8;
+    }
+    if (savedNumberOfMines) {
+        NUMBER_OF_MINES = savedNumberOfMines;
+    } else {
+        NUMBER_OF_MINES = 15;
+    }
+
+    win = false;
+    lose = false;
+    gameHasEnded = false;
+
+    board = createBoard(boardSize, NUMBER_OF_MINES);
+    boardElement = document.querySelector(".board");
+    minesLeftText.textContent = NUMBER_OF_MINES;
+
+    generate(board, boardElement, boardSize);
+}
+
 // generate the board
 function generate(board, boardElement, boardSize) {
     startSound.play();
     board.forEach((row) => {
         row.forEach((tile) => {
             boardElement.append(tile.element);
-            tile.element.addEventListener("click", () => {
-                revealTile(board, tile);
-                addMoveHistory();
-                checkGameEnd(board);
-            });
-            tile.element.addEventListener("contextmenu", (e) => {
-                e.preventDefault();
-                markTile(tile);
-                listMinesLeft(board);
-            });
+            if (!gameHasEnded) {
+                tile.element.addEventListener("click", () => {
+                    revealTile(board, tile);
+                    addMoveHistory();
+                    checkGameEnd(board);
+                });
+            }
+            if (!gameHasEnded) {
+                tile.element.addEventListener("contextmenu", (e) => {
+                    e.preventDefault();
+                    markTile(tile);
+                    listMinesLeft(board);
+                });
+            }
         });
     });
     boardElement.style.setProperty("--size", boardSize);
@@ -163,7 +169,7 @@ function createBoard(boardSize, numberOfMines) {
 }
 
 const resetButton = document.getElementById("reset-button");
-resetButton.addEventListener("click", function () {
+resetButton.addEventListener("click", () => {
     location.reload();
 });
 
@@ -309,14 +315,11 @@ function checkLose(board) {
 function checkGameEnd(board) {
     win = checkWin(board);
     lose = checkLose(board);
-    console.log("win: " + win);
-    console.log("lose: " + lose);
     //Ngăn người dùng thao tác thêm
     if (win || lose) {
-        boardElement.addEventListener("click", stopProp, { capture: true });
-        boardElement.addEventListener("contextmenu", stopProp, {
-            capture: true,
-        });
+        boardElement.addEventListener("click", stop, { capture: true });
+        boardElement.addEventListener("contextmenu", stop, { capture: true });
+        gameHasEnded = true;
     }
     //Thắng
     if (win) {
@@ -328,13 +331,11 @@ function checkGameEnd(board) {
         startSound.pause();
         messageText.textContent = "You Lost :<<";
         lostSound.play();
-    } else {
-        listMinesLeft(board);
     }
 }
 
-function stopProp(e) {
-    e.stopImmediatePropagation();
+function stop(e) {
+    e.stopPropagation();
 }
 
 //Reset cái page lại
@@ -344,6 +345,14 @@ function resetGame() {
 
 function undoMove() {
     if (moveHistory.length === 0 || gameHasEnded) {
+        gameHasEnded = false;
+        win = false;
+        lose = false;
+        listMinesLeft(board);
+        boardElement.removeEventListener("click", stop, { capture: true });
+        boardElement.removeEventListener("contextmenu", stop, {
+            capture: true,
+        });
         return;
     }
 
